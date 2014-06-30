@@ -1,13 +1,6 @@
 package nl.sogyo.jesper.webserver;
 
-import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.net.Socket;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by jvdberg on 17/06/2014.
@@ -50,11 +43,10 @@ public class Library implements WebApplication {
                 System.out.println("Library.addLastFiveSearchesToResponse: Cookie name en value in de session" + c.getName() + "=" + c.getValue());
 
 
-
                 System.out.println("Hallo doe is committen dan");
 
 
-                
+
                 if ((session.getCookie().getName()).equals(c.getName()) && (session.getCookie().getValue()).equals(c.getValue())) {
                     System.out.println("boek toegvoegd");
                     addBookToResponseBody(session.getIsbnList());
