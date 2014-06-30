@@ -72,7 +72,7 @@ public class Library implements WebApplication {
         boolean anyBookFound = false;
         parameter: for (SearchParameter searchParameter: request.getSearchParameters()) {
             if (isValidIsbnParameter(searchParameter)) {
-                book:  for (Book book: bookCollection) {
+                for (Book book: bookCollection) {
                     if (bookIsInLibrary(book, searchParameter)) {
                         if (!anyBookFound) {
                             response.setBody(response.getBodyInProcess() + "The following books could be retrieved:<br>");
@@ -84,19 +84,19 @@ public class Library implements WebApplication {
                 }
             } else {
                 response.setStatus(Responsable.HTTPStatusCode.NotFound);
-                break parameter;
+                break;
             }
             response.setBody(response.getBodyInProcess() + "ISBN: " + searchParameter.getSearchParameterValue() + "; No books found in this library for this ISBN<br>\r\n");
         }
     }
 
     private boolean isValidIsbnParameter(SearchParameter searchParameter) {
-        return ( (searchParameter.getSearchParameterName().equalsIgnoreCase("isbn") &&
-                searchParameter.getSearchParameterValue().length() == 13 ) ? true : false);
+        return ((searchParameter.getSearchParameterName().equalsIgnoreCase("isbn") &&
+                searchParameter.getSearchParameterValue().length() == 13));
     }
 
     private boolean bookIsInLibrary(Book book, SearchParameter searchParameter) {
-        return ((book.getIsbn()).equals(searchParameter.getSearchParameterValue()) ? true : false);
+        return ((book.getIsbn()).equals(searchParameter.getSearchParameterValue()));
     }
 
     public Response getResponse() {
