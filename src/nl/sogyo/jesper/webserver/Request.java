@@ -66,7 +66,7 @@ public class Request implements Requestable {
         return searchParameters;
     }
     public String getSearchParametersString() {
-        String returnString = "<br>The following parameters were passed:<br>\r\n";
+        String returnString = "<br><u>The following parameters were passed:</u><br>\r\n";
         for (SearchParameter parameter: searchParameters) {
             returnString = returnString +
                     parameter.getSearchParameterName() +
@@ -128,7 +128,7 @@ public class Request implements Requestable {
         String[] splitCompleteCookie = cookieHeaderParameterValue.split(";");
         for (String singleCookie : splitCompleteCookie) {
             String[] splitSingleCookie = singleCookie.split("=");
-            webserverCookieList.add(new WebserverCookie(splitSingleCookie[0], splitSingleCookie[1]));
+            webserverCookieList.add(new WebserverCookie(splitSingleCookie[0].trim(), splitSingleCookie[1]));
         }
     }
 }

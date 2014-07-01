@@ -10,6 +10,7 @@ public class Library implements WebApplication {
     private Response response;
     private static ArrayList<Session> sessionList = new ArrayList<>();
     private CopyCookieWebApp ccwa = new CopyCookieWebApp();
+    private int previousQueriesAdded = 0;
 
     public Library(){
         bookCollection.add(new Book("Jan", "Het Eerste Probeersel", "1111111111111"));
@@ -32,38 +33,25 @@ public class Library implements WebApplication {
     }
 
     private void addLastFiveSearchesToResponse(Request request) {
-        response.setBody(response.getBodyInProcess() + "The following books have been searched for recently: <br>");
-        System.out.println("Cookies worden gecheckt in Library.addlastfivesearchestoresponse");
-        System.out.println(request.getCookies().size());
-        cookieFor: for (Cookie c: request.getCookies()) {
-//            System.out.println(c.getName() + "=" + c.getValue());
-            System.out.println("library.addLastFiveSearchesToResponse: sessionlist size: " + sessionList.size());
-            for (Session session: sessionList){
-                System.out.println("Library.addLastFiveSearchesToResponse: SessionCookie name en value in de session" + session.getCookie().getName() + "=" + session.getCookie().getValue());
-                System.out.println("Library.addLastFiveSearchesToResponse: Cookie name en value in de session" + c.getName() + "=" + c.getValue());
-
-
-                System.out.println("Hallo doe is committen dan");
-
-
-
-                if ((session.getCookie().getName()).equals(c.getName()) && (session.getCookie().getValue()).equals(c.getValue())) {
-                    System.out.println("boek toegvoegd");
+        response.setBody(response.getBodyInProcess() + "<br><u>The following books have been searched for recently:</u><br>");
+        sessionLoop: for (int i = sessionList.size()-1 ; i >= 0; i--){
+            Session session = sessionList.get(i);
+            for (Cookie c: request.getCookies()) {
+                if ( previousQueriesAdded < 5 && (session.getCookie().getName()).equals(c.getName()) && (session.getCookie().getValue()).equals(c.getValue())) {
                     addBookToResponseBody(session.getIsbnList());
-                    continue cookieFor;
-                }
+                    continue sessionLoop;
+                } else if (previousQueriesAdded >= 5) break sessionLoop;
             }
         }
     }
 
     private void addBookToResponseBody(ArrayList<String> isbnList) {
-        System.out.println("Library.addBookToResponseBody komt hij langs, dus cookie is gevonden");
-        for (String isbn: isbnList) {
+        sessionLoop: for (String isbnOfSession: isbnList) {
             for (Book book: bookCollection){
-                if (book.getIsbn().equals(isbn)) {
-                    System.out.println("boek aan body toegevoegd ");
+                if (book.getIsbn().equals(isbnOfSession) && previousQueriesAdded < 5 ) {
                     response.setBody(response.getBodyInProcess() + "ISBN: " + book.getIsbn() + "; Author: " + book.getAuthor() + "; Title: " + book.getTitle() + "<br>");
-                }
+                    previousQueriesAdded++;
+                } else if (previousQueriesAdded >= 5) break sessionLoop;
             }
         }
     }
@@ -72,10 +60,14 @@ public class Library implements WebApplication {
         boolean anyBookFound = false;
         parameter: for (SearchParameter searchParameter: request.getSearchParameters()) {
             if (isValidIsbnParameter(searchParameter)) {
+
+                // in de session wordt dit gezochte ISBN adres opgeslagen
+                sessionList.get(sessionList.size()-1).addIsbn(searchParameter.getSearchParameterValue());
+
                 for (Book book: bookCollection) {
                     if (bookIsInLibrary(book, searchParameter)) {
                         if (!anyBookFound) {
-                            response.setBody(response.getBodyInProcess() + "The following books could be retrieved:<br>");
+                            response.setBody(response.getBodyInProcess() + "<u>The following books could be retrieved:</u><br>");
                             anyBookFound = true;
                         }
                         response.setBody(response.getBodyInProcess() + "ISBN: " + book.getIsbn() + "; Author: " + book.getAuthor() + "; Title: " + book.getTitle() + "<br>");

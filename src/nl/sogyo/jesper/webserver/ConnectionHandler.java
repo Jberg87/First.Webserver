@@ -27,6 +27,7 @@ public class ConnectionHandler implements Runnable{
                 line = reader.readLine();
             }
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            // Deze wordt uitgevoerd/aangeroepen in het begin van de executeLibrary dus hoeft niet standalone te worden gedraaid
 //            executeCCWA(writer, request);
             executeLibrary(writer, request);
             writer.flush();
